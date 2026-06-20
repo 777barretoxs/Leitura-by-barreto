@@ -108,7 +108,12 @@
             overflow-anchor: none;
         }
 
-        /* Botão Flutuante da Engrenagem (sem barra de fundo) */
+        /* Botão Flutuante da Engrenagem — estilo iOS de ícone de navegação
+           (ex: o botão de Configurações no topo dos apps nativos da Apple):
+           sem fundo, sem borda, sem badge colorido — só o glifo, leve e
+           discreto, com feedback de toque sutil em vez de "ficar preenchido"
+           quando a tela de Configurações está ativa (isso já é indicado
+           pela barra inferior, não precisa duplicar aqui). */
         .top-bar-gear {
             position: fixed;
             /* Alinhado ao centro vertical do ícone do título de cada aba
@@ -120,15 +125,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.055);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
             color: var(--text-secondary);
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
-            transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+            transition: color 0.2s ease, background 0.15s ease, transform 0.15s ease;
             padding: 0;
             z-index: 1000;
         }
@@ -138,8 +143,13 @@
             transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
+        .top-bar-gear:active {
+            background: rgba(255,255,255,0.08);
+            transform: scale(0.92);
+        }
+
         .top-bar-gear:active i {
-            transform: scale(0.8) rotate(50deg);
+            transform: scale(0.85) rotate(40deg);
         }
 
         .top-bar-gear.gear-spin i {
@@ -148,8 +158,6 @@
 
         .top-bar-gear.active {
             color: var(--accent-color);
-            border-color: var(--accent-color);
-            background: rgba(99,102,241,0.1);
         }
 
         /* ── Tela de Configurações: sub-navegação estilo Segmented Control (iOS) ── */
@@ -265,6 +273,9 @@
             box-sizing: border-box;
             display: block !important;
             will-change: transform;
+            padding-left: var(--page-x);
+            padding-right: var(--page-x);
+            padding-bottom: var(--spacing-lg);
         }
 
         #settings-swipe-track > .settings-section:not(.active) {
@@ -3775,10 +3786,10 @@
         </div>
         </div>
 
-        <div id="tab-settings" class="tab-content">
-            <h2><i class="ph ph-gear-six"></i> Configurações</h2>
+        <div id="tab-settings" class="tab-content" style="padding-left:0; padding-right:0;">
+            <h2 style="padding-left: var(--page-x); padding-right: var(--page-x);"><i class="ph ph-gear-six"></i> Configurações</h2>
 
-            <div class="settings-subnav" id="settings-subnav">
+            <div class="settings-subnav" id="settings-subnav" style="margin-left: var(--page-x); margin-right: var(--page-x);">
                 <div class="settings-chip-thumb" id="settings-chip-thumb"></div>
                 <div class="settings-chip active" data-section="settings-adjust" onclick="switchSettingsSection('settings-adjust', this)">
                     <i class="ph ph-wrench"></i> Ajuste
@@ -4203,7 +4214,7 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
             animateTabEntrance('tab-timer');
             positionSettingsThumb(true);
             positionBottomNavThumb(true);
-            requestAnimationFrame(syncGearAlignment);
+            syncGearAlignmentAfterEntrance();
             const initialTrack = document.getElementById('swipe-track');
             if (initialTrack) {
                 initialTrack.style.transition = 'none';
@@ -4427,6 +4438,18 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
         window.addEventListener('load', syncGearAlignment);
         document.addEventListener('DOMContentLoaded', syncGearAlignment);
 
+        // O título (h2) entra com uma animação de fade+translateY de 0.45s
+        // (.tab-fade-item). Medir a posição do ícone do título só no
+        // próximo frame captura ele ainda em movimento, desalinhando a
+        // engrenagem fixa. Resincronizamos algumas vezes ao longo da
+        // animação para garantir que ela termine exatamente alinhada,
+        // mesmo durante a transição.
+        function syncGearAlignmentAfterEntrance() {
+            syncGearAlignment();
+            requestAnimationFrame(syncGearAlignment);
+            [80, 160, 250, 350, 470].forEach(ms => setTimeout(syncGearAlignment, ms));
+        }
+
         function switchTab(tabId, element) {
             const current = document.getElementById(tabId);
             if (current && current.classList.contains('active')) return;
@@ -4458,7 +4481,7 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
             // Reajusta a altura depois que o conteúdo dinâmico (listas, stats)
             // termina de ser preenchido por updateAllUI/animateTabEntrance.
             requestAnimationFrame(syncSwipeViewportHeight);
-            requestAnimationFrame(syncGearAlignment);
+            syncGearAlignmentAfterEntrance();
         }
 
         /* ── Swipe entre abas a partir de qualquer ponto da tela (estilo iOS) ──
@@ -4904,6 +4927,7 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
                     });
                     positionSettingsThumb(false);
                     syncSettingsSwipeViewportHeight();
+                    requestAnimationFrame(syncGearAlignment);
                 } else {
                     switchSettingsSection(targetId, targetChip);
                 }
@@ -4967,6 +4991,7 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
             updateAllUI();
             animateTabEntrance('tab-settings');
             requestAnimationFrame(syncSettingsSwipeViewportHeight);
+            syncGearAlignmentAfterEntrance();
         }
 
         function animateTabEntrance(tabId) {
@@ -7489,7 +7514,7 @@ function showAuthScreen() {
 }
 function hideAuthScreen() {
     document.getElementById('auth-screen').classList.add('hidden');
-    requestAnimationFrame(syncGearAlignment);
+    syncGearAlignmentAfterEntrance();
 }
 
 window.toggleAuthMode = function() {
