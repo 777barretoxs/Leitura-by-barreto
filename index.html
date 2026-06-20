@@ -49,6 +49,24 @@
 
             /* Cor Base para Dias Sem Leitura */
             --level-none: #27272a;
+
+            /* ── Liquid Glass (estilo iOS 18/26) ──
+               Usado nas barras de navegação (principal e sub-abas de
+               Configurações): vidro translúcido de verdade (alta
+               saturação + blur forte), com um brilho especular sutil no
+               topo simulando luz refratada na superfície curva do vidro,
+               em vez de um painel escuro chapado. Tom escuro e bem
+               transparente (estilo iOS 26: quase preto, deixando o
+               conteúdo de fundo aparecer através do blur, com só um
+               traço fino de luz na borda — não um painel branco leitoso). */
+            --glass-bg: rgba(10,10,14,0.38);
+            --glass-bg-strong: rgba(18,18,24,0.46);
+            --glass-border: rgba(255,255,255,0.12);
+            --glass-specular: rgba(255,255,255,0.4);
+            --glass-blur: blur(38px) saturate(160%) brightness(0.92);
+            --glass-thumb-bg: rgba(255,255,255,0.10);
+            --glass-thumb-border: rgba(255,255,255,0.16);
+            --glass-thumb-blur: blur(20px) saturate(150%) brightness(1.0);
         }
 
         * {
@@ -135,7 +153,7 @@
             cursor: pointer;
             transition: color 0.2s ease, background 0.15s ease, transform 0.15s ease;
             padding: 0;
-            z-index: 1000;
+            z-index: 5000;
         }
 
         .top-bar-gear i {
@@ -171,9 +189,12 @@
             margin-bottom: var(--spacing-lg);
             padding: 3px;
             border-radius: 16px;
-            background: rgba(0,0,0,0.28);
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: inset 0 1px 4px rgba(0,0,0,0.35);
+            background: linear-gradient(180deg, var(--glass-bg) 0%, rgba(4,4,6,0.5) 100%);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05);
+            isolation: isolate;
             /* Fade sutil nas bordas indicando que há mais chips fora da
                tela quando o conteúdo não cabe inteiro (em telas estreitas) */
             -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
@@ -184,6 +205,17 @@
             display: none;
         }
 
+        .settings-subnav::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            background: linear-gradient(180deg, var(--glass-specular) 0%, rgba(255,255,255,0) 40%);
+            opacity: 0.05;
+            mix-blend-mode: overlay;
+        }
+
         .settings-chip-thumb {
             position: absolute;
             top: 3px;
@@ -191,10 +223,14 @@
             height: calc(100% - 6px);
             width: 0;
             border-radius: 13px;
-            background: linear-gradient(150deg, rgba(70,70,78,0.92) 0%, rgba(46,46,52,0.92) 100%);
-            -webkit-backdrop-filter: blur(8px);
-            backdrop-filter: blur(8px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.07) inset, 0 1px 0 rgba(255,255,255,0.09) inset;
+            background: linear-gradient(165deg, var(--glass-thumb-bg) 0%, rgba(255,255,255,0.03) 60%, rgba(255,255,255,0.01) 100%);
+            -webkit-backdrop-filter: var(--glass-thumb-blur);
+            backdrop-filter: var(--glass-thumb-blur);
+            border: 1px solid var(--glass-thumb-border);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.18),
+                inset 0 -5px 8px rgba(0,0,0,0.2),
+                0 4px 12px rgba(0,0,0,0.4);
             transition: transform 0.45s cubic-bezier(0.32, 1.5, 0.5, 1), width 0.45s cubic-bezier(0.32, 1.5, 0.5, 1);
             pointer-events: none;
             z-index: 0;
@@ -254,6 +290,11 @@
             overflow: hidden;
             position: relative;
             touch-action: pan-y;
+            transition: height 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        #settings-swipe-viewport.dragging-height {
+            transition: none !important;
         }
 
         #settings-swipe-track {
@@ -349,6 +390,14 @@
             overflow: hidden;
             position: relative;
             touch-action: pan-y; /* deixa o navegador rolar verticalmente livre, mas o eixo X é controlado por JS, sem corrida entre os dois */
+            transition: height 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        /* Durante o arrasto a altura precisa acompanhar o dedo
+           instantaneamente (sem transição), senão fica "atrasada" em
+           relação ao conteúdo que já está visível na tela. */
+        #swipe-viewport.dragging-height {
+            transition: none !important;
         }
 
         #swipe-track {
@@ -402,10 +451,10 @@
             bottom: 18px;
             left: var(--page-x);
             right: var(--page-x);
-            background-color: rgba(32, 32, 38, 0.72);
-            backdrop-filter: blur(28px) saturate(180%);
-            -webkit-backdrop-filter: blur(28px) saturate(180%);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: linear-gradient(180deg, var(--glass-bg-strong) 0%, var(--glass-bg) 60%, rgba(6,6,9,0.30) 100%);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
             border-radius: 28px;
             display: flex;
             overflow-x: auto;
@@ -414,10 +463,29 @@
             padding: 8px 10px;
             gap: 4px;
             z-index: 1000;
+            isolation: isolate;
             box-shadow:
-                0 12px 32px rgba(0, 0, 0, 0.45),
-                0 2px 8px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255,255,255,0.06);
+                0 16px 40px rgba(0, 0, 0, 0.55),
+                0 4px 14px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255,255,255,0.14),
+                inset 0 -1px 0 rgba(0,0,0,0.2),
+                inset 0 0 0 1px rgba(255,255,255,0.02);
+        }
+
+        /* Brilho especular: uma faixa de luz fina e curva no topo do
+           vidro, como a borda de uma lente reagindo à luz ambiente —
+           a marca registrada do "liquid glass" do iOS. Fica numa camada
+           própria (::before) para não interferir no blur de fundo. Bem
+           discreto aqui, já que o vidro é escuro e não deve "clarear". */
+        .bottom-nav::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            background: linear-gradient(180deg, var(--glass-specular) 0%, rgba(255,255,255,0) 32%);
+            opacity: 0.07;
+            mix-blend-mode: overlay;
         }
 
         .bottom-nav::-webkit-scrollbar {
@@ -431,10 +499,15 @@
             height: calc(100% - 16px);
             width: 0;
             border-radius: 18px;
-            background: linear-gradient(150deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 100%);
-            -webkit-backdrop-filter: blur(6px);
-            backdrop-filter: blur(6px);
-            box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset, 0 4px 12px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.05) inset;
+            background: linear-gradient(165deg, var(--glass-thumb-bg) 0%, rgba(255,255,255,0.04) 60%, rgba(255,255,255,0.02) 100%);
+            -webkit-backdrop-filter: var(--glass-thumb-blur);
+            backdrop-filter: var(--glass-thumb-blur);
+            border: 1px solid var(--glass-thumb-border);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.22),
+                inset 0 -6px 10px rgba(0,0,0,0.18),
+                0 6px 16px rgba(0,0,0,0.35),
+                0 1px 3px rgba(0,0,0,0.3);
             transition: transform 0.45s cubic-bezier(0.32, 1.5, 0.5, 1), width 0.45s cubic-bezier(0.32, 1.5, 0.5, 1), opacity 0.25s ease;
             pointer-events: none;
             z-index: 0;
@@ -801,6 +874,14 @@
             z-index: 5;
             margin: 0;
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            /* Pilha "rounded" do sistema (renderiza como SF Pro Rounded em
+               iOS/macOS) só para os números grandes — o mesmo truque que
+               os apps nativos da Apple usam pra dar destaque visual aos
+               números de Saúde/Fitness, contrastando com a Plus Jakarta
+               Sans usada no resto do app em vez de repetir a mesma fonte
+               em tudo. Cai de volta pra Jakarta/sistema normal fora do
+               iOS, sem quebrar nada. */
+            font-family: ui-rounded, "SF Pro Rounded", -apple-system, 'Plus Jakarta Sans', system-ui, sans-serif;
         }
 
         .timer-container.is-running .timer-display {
@@ -1178,8 +1259,8 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(99,102,241,0.5), rgba(139,92,246,0.4), transparent);
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
         }
 
         .cal-header {
@@ -1581,8 +1662,8 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(99,102,241,0.5), rgba(139,92,246,0.4), transparent);
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
         }
 
         .premium-card.danger-card::before {
@@ -1952,6 +2033,8 @@
             letter-spacing: -0.03em;
             line-height: 1;
             margin-bottom: 5px;
+            font-variant-numeric: tabular-nums;
+            font-family: ui-rounded, "SF Pro Rounded", -apple-system, 'Plus Jakarta Sans', system-ui, sans-serif;
         }
 
         .stat-label {
@@ -2112,13 +2195,17 @@
             overflow: hidden;
         }
 
-        /* Linha de acento no topo */
+        /* Linha no topo — neutra e discreta por padrão. O destaque indigo
+           fica reservado pra elementos que realmente precisam chamar
+           atenção (timer rodando, meta do dia, foco ativo) — repetir o
+           acento colorido em todo card faz nada parecer "em destaque" de
+           verdade. */
         .calendar-wrapper::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(99,102,241,0.5), rgba(139,92,246,0.4), transparent);
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
         }
 
         .calendar-nav-row {
@@ -2326,8 +2413,8 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(99,102,241,0.4), rgba(168,85,247,0.35), transparent);
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
         }
 
         /* Grade horizontal de referência */
@@ -2492,20 +2579,30 @@
             }
         }
 
-        /* Linha de acento no topo, idêntica à de .calendar-wrapper::before / .chart-wrapper::before */
+        /* Linha no topo neutra por padrão; vira indigo só quando o card
+           está com as ações reveladas (estado real de "em foco"), em vez
+           de toda capa da estante já nascer com o acento colorido. */
         .book-card-premium::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0;
-            height: 2px;
+            height: 1px;
             border-radius: 22px 22px 0 0;
-            background: linear-gradient(90deg, transparent, rgba(99,102,241,0.5), rgba(139,92,246,0.4), transparent);
-            opacity: 0.7;
-            transition: opacity 0.25s ease;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
+            opacity: 1;
+            transition: opacity 0.25s ease, background 0.25s ease;
             z-index: 2;
         }
-        .book-card-premium.show-actions::before { opacity: 1; }
-        @media (hover: hover) { .book-card-premium:hover::before { opacity: 1; } }
+        .book-card-premium.show-actions::before {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(99,102,241,0.5), rgba(139,92,246,0.4), transparent);
+        }
+        @media (hover: hover) {
+            .book-card-premium:hover::before {
+                height: 2px;
+                background: linear-gradient(90deg, transparent, rgba(99,102,241,0.5), rgba(139,92,246,0.4), transparent);
+            }
+        }
 
         /* Capa lateral */
         .book-cover-wrap {
@@ -3062,9 +3159,9 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0;
-            height: 2px;
+            height: 1px;
             border-radius: 22px 22px 0 0;
-            background: linear-gradient(90deg, transparent, rgba(99,102,241,0.5), rgba(168,85,247,0.4), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
         }
 
         .trophy-card-top {
@@ -3367,28 +3464,29 @@
 .ddm-footer{padding:14px 22px 20px;flex-shrink:0;border-top:1px solid rgba(255,255,255,.04)}
 .ddm-close-full-btn{background:rgba(255,255,255,.06) !important;border:1px solid rgba(255,255,255,.08) !important;border-radius:16px !important;color:var(--text-secondary) !important;font-size:14px !important;font-weight:600 !important;padding:12px !important}
 .custom-alert-backdrop.show{display:flex;opacity:1;backdrop-filter:blur(8px)}.custom-alert-card{width:min(92vw,420px);background:linear-gradient(180deg,rgba(17,24,39,.98),rgba(12,16,27,.98));color:#fff;border:1px solid rgba(129,140,248,.22);border-radius:24px;box-shadow:0 22px 60px rgba(0,0,0,.48);padding:22px 20px;transform:translateY(16px) scale(.96);opacity:0;transition:transform .22s cubic-bezier(.2,.8,.2,1),opacity .22s ease,box-shadow .22s ease;position:relative;overflow:hidden}.custom-alert-card::before{content:'';position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,#6366f1,#8b5cf6,#22c55e)}.custom-alert-backdrop.show .custom-alert-card{transform:translateY(0) scale(1);opacity:1;box-shadow:0 28px 72px rgba(99,102,241,.16),0 18px 48px rgba(0,0,0,.46)}.custom-alert-title{font-size:16px;font-weight:700;margin:4px 0 10px;color:#e5e7ff}.custom-alert-message{font-size:14px;line-height:1.55;color:rgba(255,255,255,.9);margin:0 0 18px}.custom-alert-actions{display:flex;justify-content:flex-end;gap:10px}.custom-alert-btn{border:none;border-radius:14px;padding:10px 18px;font-weight:700;cursor:pointer;transition:transform .15s ease,filter .15s ease,background .15s ease}.custom-alert-btn:hover{transform:translateY(-1px)}.custom-alert-ok{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 10px 20px rgba(99,102,241,.22)}.custom-alert-cancel{background:rgba(255,255,255,.08);color:#fff}
-.auth-screen{position:fixed;inset:0;background:radial-gradient(circle at 50% 0%,#1a1f3a 0%,#0a0a0f 60%);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;font-family:inherit}
+.auth-screen{position:fixed;inset:0;background:var(--bg-color);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;font-family:inherit}
 .auth-screen.hidden{display:none}
-.auth-box{width:100%;max-width:380px;background:linear-gradient(180deg,rgba(17,24,39,.96),rgba(12,16,27,.96));border:1px solid rgba(129,140,248,.18);border-radius:24px;padding:32px 26px;box-shadow:0 28px 72px rgba(0,0,0,.5)}
-.auth-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}
-.auth-logo i{font-size:28px;background:linear-gradient(135deg,#818cf8,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.auth-box{width:100%;max-width:380px;background:linear-gradient(150deg,rgba(30,30,36,0.92) 0%,rgba(16,16,19,0.97) 100%);border:1px solid rgba(255,255,255,0.055);border-radius:20px;padding:32px 26px;box-shadow:var(--shadow-lift),inset 0 1px 0 rgba(255,255,255,0.04)}
+.auth-logo{display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.auth-logo i{font-size:28px;color:#fff;background:linear-gradient(150deg,var(--accent-color) 0%,#4338ca 100%);width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(99,102,241,0.35),inset 0 1px 0 rgba(255,255,255,0.18)}
 .auth-title{font-size:20px;font-weight:700;color:#fff;text-align:center;margin:0 0 4px}
 .auth-subtitle{font-size:13px;color:var(--text-secondary,#9ca3af);text-align:center;margin:0 0 24px}
 .auth-field{margin-bottom:14px}
 .auth-field label{display:block;font-size:12px;font-weight:600;color:#cbd5e1;margin-bottom:6px}
-.auth-field input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;color:#fff;font-size:14px;outline:none;transition:border-color .15s ease}
-.auth-field input:focus{border-color:#818cf8}
+.auth-field input{width:100%;box-sizing:border-box;background:linear-gradient(150deg,rgba(32,32,38,0.9) 0%,rgba(20,20,24,0.95) 100%);border:1px solid rgba(255,255,255,.055);border-radius:13px;padding:12px 14px;color:#fff;font-size:14px;outline:none;transition:border-color .15s ease,box-shadow .15s ease}
+.auth-field input:focus{border-color:var(--accent-color);box-shadow:0 0 0 3px var(--accent-glow)}
 .auth-error{display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;font-size:12.5px;border-radius:10px;padding:10px 12px;margin-bottom:14px;line-height:1.4}
 .auth-error.show{display:block}
 .auth-error.show-success{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);color:#86efac}
-.auth-submit{width:100%;border:none;border-radius:14px;padding:13px;font-weight:700;font-size:14px;color:#fff;background:linear-gradient(135deg,#6366f1,#8b5cf6);cursor:pointer;box-shadow:0 10px 24px rgba(99,102,241,.28);transition:transform .15s ease,opacity .15s ease}
+.auth-submit{width:100%;border:none;border-radius:13px;padding:13px;font-weight:700;font-size:14px;color:#fff;background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);cursor:pointer;box-shadow:0 6px 22px rgba(99,102,241,0.3),inset 0 1px 0 rgba(255,255,255,0.18);transition:transform .15s ease,opacity .15s ease,filter .15s ease}
 .auth-submit:active{transform:scale(.98)}
 .auth-submit:disabled{opacity:.6;cursor:default}
+@media (hover:hover){.auth-submit:hover{filter:brightness(1.08)}}
 .auth-switch{text-align:center;font-size:13px;color:var(--text-secondary,#9ca3af);margin-top:18px}
 .auth-switch a{color:#a5b4fc;font-weight:600;text-decoration:none;cursor:pointer}
 .auth-sync-note{display:flex;align-items:flex-start;gap:8px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);border-radius:12px;padding:10px 12px;margin-bottom:18px;font-size:11.5px;line-height:1.45;color:#c7d2fe}
 .auth-sync-note i{font-size:16px;flex-shrink:0;margin-top:1px;color:#a5b4fc}
-.auth-loading-overlay{position:fixed;inset:0;background:radial-gradient(circle at 50% 42%,#1c2147 0%,#0a0a0f 62%);z-index:10000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:0}
+.auth-loading-overlay{position:fixed;inset:0;background:var(--bg-color);z-index:10000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:0}
 .auth-loading-overlay.show{display:flex}
 .auth-loading-stage{position:relative;width:148px;height:148px;display:flex;align-items:center;justify-content:center}
 .auth-loading-glow{position:absolute;width:148px;height:148px;border-radius:50%;background:radial-gradient(circle,rgba(129,140,248,.5) 0%,rgba(139,92,246,.22) 45%,rgba(139,92,246,0) 72%);filter:blur(2px);animation:authGlowPulse 2.6s ease-in-out infinite}
@@ -3420,8 +3518,8 @@
 .auth-password-wrap{position:relative}
 .auth-password-wrap input.auth-password-real{position:absolute;inset:0;z-index:2;cursor:text;width:100%;height:100%;background:transparent;border-color:transparent;color:transparent;caret-color:transparent}
 .auth-password-wrap input.auth-password-real::placeholder{color:transparent}
-.auth-password-wrap .auth-password-display{position:relative;z-index:1;pointer-events:none;display:flex;align-items:center;width:100%;box-sizing:border-box;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;color:#fff;font-size:14px;font-family:inherit;overflow:hidden;white-space:nowrap;transition:border-color .15s ease}
-.auth-password-wrap .auth-password-display.focused{border-color:#818cf8}
+.auth-password-wrap .auth-password-display{position:relative;z-index:1;pointer-events:none;display:flex;align-items:center;width:100%;box-sizing:border-box;background:linear-gradient(150deg,rgba(32,32,38,0.9) 0%,rgba(20,20,24,0.95) 100%);border:1px solid rgba(255,255,255,.055);border-radius:13px;padding:12px 14px;color:#fff;font-size:14px;font-family:inherit;overflow:hidden;white-space:nowrap;transition:border-color .15s ease,box-shadow .15s ease}
+.auth-password-wrap .auth-password-display.focused{border-color:var(--accent-color);box-shadow:0 0 0 3px var(--accent-glow)}
 .auth-password-display .auth-password-display-text{white-space:pre}
 .auth-password-display .auth-password-display-placeholder{color:#6b7280}
 .auth-password-fake-caret{display:inline-block;width:1.5px;align-self:center;height:1.15em;background:#fff;flex-shrink:0;opacity:0;margin-left:1px}
@@ -3429,9 +3527,9 @@
 @keyframes authCaretBlink{0%,49%{opacity:1}50%,100%{opacity:0}}
 .auth-remember{display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:14px;user-select:none}
 .auth-remember input{position:absolute;opacity:0;width:0;height:0}
-.auth-remember-box{width:19px;height:19px;flex-shrink:0;border-radius:6px;border:1.5px solid rgba(255,255,255,.22);background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;transition:background .15s ease,border-color .15s ease}
+.auth-remember-box{width:20px;height:20px;flex-shrink:0;border-radius:7px;border:1px solid var(--glass-thumb-border);background:linear-gradient(165deg,var(--glass-thumb-bg) 0%,rgba(255,255,255,0.03) 60%,rgba(255,255,255,0.01) 100%);-webkit-backdrop-filter:var(--glass-thumb-blur);backdrop-filter:var(--glass-thumb-blur);display:flex;align-items:center;justify-content:center;transition:background .15s ease,border-color .15s ease,box-shadow .15s ease}
 .auth-remember-box i{font-size:13px;color:#fff;opacity:0;transform:scale(.6);transition:opacity .12s ease,transform .12s ease}
-.auth-remember input:checked + .auth-remember-box{background:linear-gradient(135deg,#6366f1,#8b5cf6);border-color:#818cf8}
+.auth-remember input:checked + .auth-remember-box{background:linear-gradient(150deg,var(--accent-color) 0%,#4338ca 100%);border-color:rgba(129,140,248,.5);box-shadow:0 4px 14px rgba(99,102,241,0.3),inset 0 1px 0 rgba(255,255,255,0.18)}
 .auth-remember input:checked + .auth-remember-box i{opacity:1;transform:scale(1)}
 .auth-remember-text{font-size:12.5px;color:#cbd5e1;font-weight:500}
 .auth-show-password{margin-bottom:10px}
@@ -4222,7 +4320,17 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
                 void initialTrack.offsetWidth;
                 initialTrack.style.transition = '';
             }
-            syncSwipeViewportHeight();
+            // No carregamento inicial a altura precisa "aparecer" já correta,
+            // sem a transição suave (que é só para trocas de aba depois).
+            const initialViewport = document.getElementById('swipe-viewport');
+            if (initialViewport) {
+                initialViewport.classList.add('dragging-height');
+                syncSwipeViewportHeight();
+                void initialViewport.offsetWidth;
+                initialViewport.classList.remove('dragging-height');
+            } else {
+                syncSwipeViewportHeight();
+            }
             requestAnimationFrame(syncSwipeViewportHeight);
         };
 
@@ -4419,36 +4527,15 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
         }
         window.addEventListener('resize', syncSwipeViewportHeight);
 
-        function syncGearAlignment() {
-            // Alinha o centro vertical da engrenagem fixa com o centro
-            // vertical do ícone do título (h2 i) da aba ativa. Mede a
-            // posição real no DOM em vez de depender de um cálculo CSS
-            // fixo, então continua correto mesmo que o título, a fonte
-            // ou o espaçamento mudem.
-            const gearBtn = document.querySelector('.top-bar-gear');
-            const activeTab = document.querySelector('.tab-content.active');
-            const titleIcon = activeTab ? activeTab.querySelector('h2 i') : null;
-            if (!gearBtn || !titleIcon) return;
-            const iconRect = titleIcon.getBoundingClientRect();
-            const iconCenterY = iconRect.top + iconRect.height / 2;
-            const gearHeight = gearBtn.offsetHeight || 38;
-            gearBtn.style.top = (iconCenterY - gearHeight / 2) + 'px';
-        }
-        window.addEventListener('resize', syncGearAlignment);
-        window.addEventListener('load', syncGearAlignment);
-        document.addEventListener('DOMContentLoaded', syncGearAlignment);
-
-        // O título (h2) entra com uma animação de fade+translateY de 0.45s
-        // (.tab-fade-item). Medir a posição do ícone do título só no
-        // próximo frame captura ele ainda em movimento, desalinhando a
-        // engrenagem fixa. Resincronizamos algumas vezes ao longo da
-        // animação para garantir que ela termine exatamente alinhada,
-        // mesmo durante a transição.
-        function syncGearAlignmentAfterEntrance() {
-            syncGearAlignment();
-            requestAnimationFrame(syncGearAlignment);
-            [80, 160, 250, 350, 470].forEach(ms => setTimeout(syncGearAlignment, ms));
-        }
+        // A engrenagem agora fica fixa só por CSS (ver .top-bar-gear no
+        // <style>, propriedade `top`), sem nenhuma medição via JS. Isso
+        // elimina de vez qualquer cenário em que ela suma ou pule de
+        // lugar por causa de timing de layout/scroll durante trocas de
+        // aba — a posição nunca depende de getBoundingClientRect() de
+        // outro elemento, só do espaçamento fixo do topo, que é igual em
+        // todas as abas por design.
+        function syncGearAlignment() {}
+        function syncGearAlignmentAfterEntrance() {}
 
         function switchTab(tabId, element) {
             const current = document.getElementById(tabId);
@@ -4477,9 +4564,16 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
             if (gearBtn) gearBtn.classList.toggle('active', tabId === 'tab-settings');
 
             updateAllUI();
-            animateTabEntrance(tabId);
+            // Propositalmente SEM animateTabEntrance aqui: a troca de aba via
+            // toque/swipe já é representada inteiramente pelo deslize do
+            // #swipe-track (transform). Disparar também o fade/stagger de
+            // entrada nos itens da aba nova empilha uma segunda animação por
+            // cima da primeira, o que lê como "mecanizado" em vez de uma
+            // única tela fluida (estilo iOS real: só a tela desliza, nada
+            // mais aparece/desvanece separadamente). O fade de entrada fica
+            // reservado só para o carregamento inicial do app.
             // Reajusta a altura depois que o conteúdo dinâmico (listas, stats)
-            // termina de ser preenchido por updateAllUI/animateTabEntrance.
+            // termina de ser preenchido por updateAllUI.
             requestAnimationFrame(syncSwipeViewportHeight);
             syncGearAlignmentAfterEntrance();
         }
@@ -4640,9 +4734,12 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
                     // Durante o arrasto, expande o viewport para caber a
                     // maior altura entre a aba atual e a vizinha na direção
                     // do gesto, evitando que o conteúdo da vizinha seja
-                    // cortado enquanto desliza para dentro da tela.
+                    // cortado enquanto desliza para dentro da tela. Essa
+                    // expansão precisa ser instantânea (sem a transição de
+                    // height), pois já acompanha o dedo em tempo real.
                     const viewport = document.getElementById('swipe-viewport');
                     if (viewport) {
+                        viewport.classList.add('dragging-height');
                         const currentTab = document.getElementById(SWIPE_TAB_ORDER[currentIndex]);
                         const nextTab = document.getElementById(SWIPE_TAB_ORDER[currentIndex + 1]);
                         const prevTab = document.getElementById(SWIPE_TAB_ORDER[currentIndex - 1]);
@@ -4684,6 +4781,8 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
                 if (!decided || !isHorizontal) { decided = false; return; }
 
                 track.classList.remove('dragging');
+                const viewportEl = document.getElementById('swipe-viewport');
+                if (viewportEl) viewportEl.classList.remove('dragging-height');
 
                 const progress = deltaPx / viewportWidth;
                 const flick = Math.abs(velocity) > FLICK_VELOCITY;
@@ -4868,6 +4967,7 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
                     }
 
                     track.classList.add('dragging');
+                    if (viewport) viewport.classList.add('dragging-height');
 
                     const currentSection = document.getElementById(SETTINGS_SECTION_ORDER[currentIndex]);
                     const nextSection = document.getElementById(SETTINGS_SECTION_ORDER[currentIndex + 1]);
@@ -4906,6 +5006,8 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
                 if (!decided || !isHorizontal) { decided = false; return; }
 
                 track.classList.remove('dragging');
+                const settingsViewportEl = document.getElementById('settings-swipe-viewport');
+                if (settingsViewportEl) settingsViewportEl.classList.remove('dragging-height');
 
                 const progress = deltaPx / viewportWidth;
                 const flick = Math.abs(velocity) > FLICK_VELOCITY;
@@ -4989,7 +5091,9 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
 
             positionSettingsThumb(false);
             updateAllUI();
-            animateTabEntrance('tab-settings');
+            // Mesma decisão de switchTab: sem fade/stagger de entrada aqui,
+            // só o deslize do #settings-swipe-track. Ver comentário em
+            // switchTab para o motivo (evitar duas animações empilhadas).
             requestAnimationFrame(syncSettingsSwipeViewportHeight);
             syncGearAlignmentAfterEntrance();
         }
