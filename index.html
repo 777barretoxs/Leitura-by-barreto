@@ -3464,11 +3464,11 @@
 .ddm-footer{padding:14px 22px 20px;flex-shrink:0;border-top:1px solid rgba(255,255,255,.04)}
 .ddm-close-full-btn{background:rgba(255,255,255,.06) !important;border:1px solid rgba(255,255,255,.08) !important;border-radius:16px !important;color:var(--text-secondary) !important;font-size:14px !important;font-weight:600 !important;padding:12px !important}
 .custom-alert-backdrop.show{display:flex;opacity:1;backdrop-filter:blur(8px)}.custom-alert-card{width:min(92vw,420px);background:linear-gradient(150deg,rgba(30,30,36,0.92) 0%,rgba(16,16,19,0.97) 100%);color:#fff;border:1px solid rgba(255,255,255,0.055);border-radius:20px;box-shadow:var(--shadow-lift),inset 0 1px 0 rgba(255,255,255,0.04);padding:22px 20px;transform:translateY(16px) scale(.96);opacity:0;transition:transform .22s cubic-bezier(.2,.8,.2,1),opacity .22s ease,box-shadow .22s ease;position:relative;overflow:hidden}.custom-alert-card::before{content:'';position:absolute;inset:0 0 auto 0;height:2px;background:linear-gradient(90deg,transparent,rgba(99,102,241,0.5),rgba(139,92,246,0.4),transparent)}.custom-alert-backdrop.show .custom-alert-card{transform:translateY(0) scale(1);opacity:1}.custom-alert-title{font-size:16px;font-weight:700;margin:4px 0 10px;color:var(--text-primary)}.custom-alert-message{font-size:14px;line-height:1.55;color:var(--text-secondary);margin:0 0 18px}.custom-alert-actions{display:flex;justify-content:flex-end;gap:10px}.custom-alert-btn{border:none;border-radius:13px;padding:10px 18px;font-weight:700;cursor:pointer;transition:transform .15s ease,filter .15s ease,background .15s ease}.custom-alert-btn:active{transform:scale(.96)}@media (hover:hover){.custom-alert-btn:hover{filter:brightness(1.08)}}.custom-alert-ok{background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);color:#fff;box-shadow:0 6px 22px rgba(99,102,241,0.3),inset 0 1px 0 rgba(255,255,255,0.18)}.custom-alert-cancel{background:linear-gradient(150deg,rgba(38,38,44,0.95) 0%,rgba(24,24,28,0.95) 100%);border:1px solid rgba(255,255,255,0.06);color:var(--text-primary)}
-.auth-screen{position:fixed;inset:0;background:var(--bg-color);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;font-family:inherit}
+.auth-screen{position:fixed;inset:0;background:radial-gradient(circle at 50% 0%,#1a1f3a 0%,#0a0a0f 60%);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;font-family:inherit}
 .auth-screen.hidden{display:none}
 .auth-box{width:100%;max-width:380px;background:linear-gradient(150deg,rgba(30,30,36,0.92) 0%,rgba(16,16,19,0.97) 100%);border:1px solid rgba(255,255,255,0.055);border-radius:20px;padding:32px 26px;box-shadow:var(--shadow-lift),inset 0 1px 0 rgba(255,255,255,0.04)}
 .auth-logo{display:flex;align-items:center;justify-content:center;margin-bottom:18px}
-.auth-logo i{font-size:28px;color:#fff;background:linear-gradient(150deg,var(--accent-color) 0%,#4338ca 100%);width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(99,102,241,0.35),inset 0 1px 0 rgba(255,255,255,0.18)}
+.auth-logo img{width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(99,102,241,0.35),inset 0 1px 0 rgba(255,255,255,0.18);object-fit:contain}
 .auth-title{font-size:20px;font-weight:700;color:#fff;text-align:center;margin:0 0 4px}
 .auth-subtitle{font-size:13px;color:var(--text-secondary,#9ca3af);text-align:center;margin:0 0 24px}
 .auth-field{margin-bottom:14px}
@@ -3484,9 +3484,10 @@
 @media (hover:hover){.auth-submit:hover{filter:brightness(1.08)}}
 .auth-switch{text-align:center;font-size:13px;color:var(--text-secondary,#9ca3af);margin-top:18px}
 .auth-switch a{color:#a5b4fc;font-weight:600;text-decoration:none;cursor:pointer}
+.auth-credit{text-align:center;font-size:11px;color:var(--text-muted,#52525b);margin-top:22px}
 .auth-sync-note{display:flex;align-items:flex-start;gap:8px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);border-radius:12px;padding:10px 12px;margin-bottom:18px;font-size:11.5px;line-height:1.45;color:#c7d2fe}
 .auth-sync-note i{font-size:16px;flex-shrink:0;margin-top:1px;color:#a5b4fc}
-.auth-loading-overlay{position:fixed;inset:0;background:var(--bg-color);z-index:10000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:0}
+.auth-loading-overlay{position:fixed;inset:0;background:radial-gradient(circle at 50% 0%,#1a1f3a 0%,#0a0a0f 60%);z-index:10000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:0}
 .auth-loading-overlay.show{display:flex}
 .auth-loading-stage{position:relative;width:148px;height:148px;display:flex;align-items:center;justify-content:center}
 .auth-loading-glow{position:absolute;width:148px;height:148px;border-radius:50%;background:radial-gradient(circle,rgba(129,140,248,.5) 0%,rgba(139,92,246,.22) 45%,rgba(139,92,246,0) 72%);filter:blur(2px);animation:authGlowPulse 2.6s ease-in-out infinite}
@@ -3518,9 +3519,10 @@
 .auth-password-wrap{position:relative}
 .auth-password-wrap input.auth-password-real{position:absolute;inset:0;z-index:2;cursor:text;width:100%;height:100%;background:transparent;border-color:transparent;color:transparent;caret-color:transparent}
 .auth-password-wrap input.auth-password-real::placeholder{color:transparent}
-.auth-password-wrap .auth-password-display{position:relative;z-index:1;pointer-events:none;display:flex;align-items:center;width:100%;box-sizing:border-box;background:linear-gradient(150deg,rgba(32,32,38,0.9) 0%,rgba(20,20,24,0.95) 100%);border:1px solid rgba(255,255,255,.055);border-radius:13px;padding:12px 14px;color:#fff;font-size:14px;font-family:inherit;overflow:hidden;white-space:nowrap;transition:border-color .15s ease,box-shadow .15s ease}
+.auth-password-wrap .auth-password-display{position:relative;z-index:1;pointer-events:none;display:flex;align-items:center;width:100%;height:47px;box-sizing:border-box;background:linear-gradient(150deg,rgba(32,32,38,0.9) 0%,rgba(20,20,24,0.95) 100%);border:1px solid rgba(255,255,255,.055);border-radius:13px;padding:12px 14px;color:#fff;font-size:14px;font-family:inherit;overflow:hidden;white-space:nowrap;transition:border-color .15s ease,box-shadow .15s ease}
 .auth-password-wrap .auth-password-display.focused{border-color:var(--accent-color);box-shadow:0 0 0 3px var(--accent-glow)}
 .auth-password-display .auth-password-display-text{white-space:pre}
+.auth-password-display .auth-password-display-text-after{white-space:pre}
 .auth-password-display .auth-password-display-placeholder{color:#6b7280}
 .auth-password-fake-caret{display:inline-block;width:1.5px;align-self:center;height:1.15em;background:#fff;flex-shrink:0;opacity:0;margin-left:1px}
 .auth-password-fake-caret.show{animation:authCaretBlink 1s steps(1) infinite}
@@ -3540,8 +3542,8 @@
 <!-- ============ TELA DE LOGIN / REGISTRO ============ -->
 <div id="auth-screen" class="auth-screen">
     <div class="auth-box">
-        <div class="auth-logo"><i class="ph ph-books"></i></div>
-        <h1 class="auth-title" id="auth-title">Bem-vindo de volta</h1>
+        <div class="auth-logo"><img src="icon-512.png" alt="Leitura"></div>
+        <h1 class="auth-title" id="auth-title">Bem-Vindo</h1>
         <p class="auth-subtitle" id="auth-subtitle">Entre para sincronizar seu diário de leitura</p>
 
         <div class="auth-sync-note">
@@ -3578,7 +3580,7 @@
         <label class="auth-remember">
             <input type="checkbox" id="auth-remember-checkbox" checked>
             <span class="auth-remember-box"><i class="ph ph-check"></i></span>
-            <span class="auth-remember-text">Manter conectado neste aparelho</span>
+            <span class="auth-remember-text">MANTER-SE CONECTADO</span>
         </label>
 
         <button class="auth-submit" id="auth-submit-btn" onclick="handleAuthSubmit()">Entrar</button>
@@ -3587,6 +3589,7 @@
             Ainda não tem conta? <a onclick="toggleAuthMode()">Criar conta</a>
         </p>
     </div>
+    <p class="auth-credit">developed by @barretoxs</p>
 </div>
 
 <!-- ============ OVERLAY DE CARREGAMENTO/SYNC ============ -->
@@ -7638,7 +7641,7 @@ window.toggleAuthMode = function() {
         document.getElementById('auth-switch-text').innerHTML = 'Já tem conta? <a onclick="toggleAuthMode()">Entrar</a>';
     } else {
         confirmField.style.display = 'none';
-        document.getElementById('auth-title').textContent = 'Bem-vindo de volta';
+        document.getElementById('auth-title').textContent = 'Bem-Vindo';
         document.getElementById('auth-subtitle').textContent = 'Entre para sincronizar seu diário de leitura';
         document.getElementById('auth-submit-btn').textContent = 'Entrar';
         document.getElementById('auth-switch-text').innerHTML = 'Ainda não tem conta? <a onclick="toggleAuthMode()">Criar conta</a>';
@@ -7691,7 +7694,7 @@ window.handleAuthSubmit = async function() {
             await signOut(auth);
             isAuthMode = 'login';
             document.getElementById('auth-confirm-password-field').style.display = 'none';
-            document.getElementById('auth-title').textContent = 'Bem-vindo de volta';
+            document.getElementById('auth-title').textContent = 'Bem-Vindo';
             document.getElementById('auth-subtitle').textContent = 'Entre para sincronizar seu diário de leitura';
             document.getElementById('auth-submit-btn').textContent = 'Entrar';
             document.getElementById('auth-switch-text').innerHTML = 'Ainda não tem conta? <a onclick="toggleAuthMode()">Criar conta</a>';
@@ -7911,9 +7914,13 @@ function setupPasswordReveal(inputId, displayId) {
     const fakeCaret = document.createElement('span');
     fakeCaret.className = 'auth-password-fake-caret';
 
+    const textAfterSpan = document.createElement('span');
+    textAfterSpan.className = 'auth-password-display-text-after';
+
     displayBox.appendChild(placeholderSpan);
     displayBox.appendChild(textSpan);
     displayBox.appendChild(fakeCaret);
+    displayBox.appendChild(textAfterSpan);
     realInput.parentElement.appendChild(displayBox);
 
     let revealTimeout = null;
@@ -7922,17 +7929,24 @@ function setupPasswordReveal(inputId, displayId) {
 
     function syncDisplay(revealLast) {
         const val = realInput.value;
+        const caretPos = (realInput.selectionStart != null) ? realInput.selectionStart : val.length;
         let shown;
         if (showPassword) {
             shown = val;
         } else if (!val) {
             shown = '';
-        } else if (revealLast) {
-            shown = '•'.repeat(val.length - 1) + val.slice(-1);
+        } else if (revealLast && caretPos > 0) {
+            // Revela o caractere imediatamente antes do cursor — é o que
+            // acabou de ser digitado, esteja o cursor no fim ou no meio.
+            shown = '•'.repeat(caretPos - 1) + val[caretPos - 1] + '•'.repeat(val.length - caretPos);
         } else {
             shown = '•'.repeat(val.length);
         }
-        textSpan.textContent = shown;
+        // Divide o texto exibido na posição real do cursor (selectionStart),
+        // para que o caret falso fique sempre entre os dois pedaços — em
+        // vez de fixo no fim, ele acompanha cliques, setas e seleção.
+        textSpan.textContent = shown.slice(0, caretPos);
+        textAfterSpan.textContent = shown.slice(caretPos);
         const isFocused = document.activeElement === realInput;
         placeholderSpan.style.display = (shown || isFocused) ? 'none' : '';
     }
@@ -7949,10 +7963,17 @@ function setupPasswordReveal(inputId, displayId) {
         }
     });
 
+    // Qualquer mudança na posição do cursor (clique, setas, seleção,
+    // Home/End) precisa re-sincronizar o caret falso na nova posição.
+    ['click', 'keyup', 'select', 'touchend'].forEach(evt => {
+        realInput.addEventListener(evt, () => syncDisplay(false));
+    });
+
     function showCaret() {
         fakeCaret.classList.add('show');
         displayBox.classList.add('focused');
         placeholderSpan.style.display = 'none';
+        syncDisplay(false);
     }
     function hideCaret() {
         fakeCaret.classList.remove('show');
@@ -7975,6 +7996,7 @@ function setupPasswordReveal(inputId, displayId) {
         lastLength = 0;
         clearTimeout(revealTimeout);
         textSpan.textContent = '';
+        textAfterSpan.textContent = '';
         placeholderSpan.style.display = '';
         hideCaret();
     });
