@@ -85,7 +85,6 @@
         .container {
             max-width: 520px;
             margin: 0 auto;
-            padding: var(--spacing-lg) var(--page-x);
             padding-top: calc(56px + var(--spacing-lg));
             overflow-anchor: none;
         }
@@ -300,6 +299,15 @@
         .tab-content {
             display: none;
             animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            /* O recuo lateral do conteúdo (cards, textos, ícones) vive
+               aqui — não no .container nem no #swipe-viewport — para que
+               o carrossel de swipe entre abas ocupe 100% da largura real
+               da tela (sem faixa preta nas bordas) e o conteúdo de cada
+               aba acompanhe a tela toda durante o arrasto. */
+            padding-left: var(--page-x);
+            padding-right: var(--page-x);
+            padding-bottom: var(--spacing-lg);
+            box-sizing: border-box;
         }
 
         .tab-content.active {
