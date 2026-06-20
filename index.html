@@ -69,6 +69,11 @@
         }
 
         body {
+            /* Cor sólida de fallback; o gradiente premium real vem do
+               pseudo-elemento body::before (ver abaixo), que usa
+               position: fixed em vez de background-attachment: fixed —
+               isso evita o jank de scroll conhecido do background-
+               attachment: fixed no Safari iOS e em alguns Android. */
             background-color: var(--bg-color);
             color: var(--text-primary);
             padding-bottom: 110px;
@@ -80,6 +85,20 @@
             width: 100%;
             min-height: 100vh;
             min-height: 100dvh;
+            position: relative;
+        }
+
+        body::before {
+            /* Mesmo gradiente premium azul-marinho da tela de login e do
+               loading (.auth-screen / .auth-loading-overlay), usado como
+               base visual de todas as abas e sub-abas. Fixo em relação à
+               tela (não rola com o conteúdo, não tem custo de scroll). */
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, #1a1f3a 0%, #0a0a0f 60%);
+            z-index: -1;
+            pointer-events: none;
         }
 
         .container {
@@ -4184,6 +4203,7 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
             animateTabEntrance('tab-timer');
             positionSettingsThumb(true);
             positionBottomNavThumb(true);
+            requestAnimationFrame(syncGearAlignment);
             const initialTrack = document.getElementById('swipe-track');
             if (initialTrack) {
                 initialTrack.style.transition = 'none';
@@ -4388,6 +4408,25 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
         }
         window.addEventListener('resize', syncSwipeViewportHeight);
 
+        function syncGearAlignment() {
+            // Alinha o centro vertical da engrenagem fixa com o centro
+            // vertical do ícone do título (h2 i) da aba ativa. Mede a
+            // posição real no DOM em vez de depender de um cálculo CSS
+            // fixo, então continua correto mesmo que o título, a fonte
+            // ou o espaçamento mudem.
+            const gearBtn = document.querySelector('.top-bar-gear');
+            const activeTab = document.querySelector('.tab-content.active');
+            const titleIcon = activeTab ? activeTab.querySelector('h2 i') : null;
+            if (!gearBtn || !titleIcon) return;
+            const iconRect = titleIcon.getBoundingClientRect();
+            const iconCenterY = iconRect.top + iconRect.height / 2;
+            const gearHeight = gearBtn.offsetHeight || 38;
+            gearBtn.style.top = (iconCenterY - gearHeight / 2) + 'px';
+        }
+        window.addEventListener('resize', syncGearAlignment);
+        window.addEventListener('load', syncGearAlignment);
+        document.addEventListener('DOMContentLoaded', syncGearAlignment);
+
         function switchTab(tabId, element) {
             const current = document.getElementById(tabId);
             if (current && current.classList.contains('active')) return;
@@ -4419,6 +4458,7 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
             // Reajusta a altura depois que o conteúdo dinâmico (listas, stats)
             // termina de ser preenchido por updateAllUI/animateTabEntrance.
             requestAnimationFrame(syncSwipeViewportHeight);
+            requestAnimationFrame(syncGearAlignment);
         }
 
         /* ── Swipe entre abas a partir de qualquer ponto da tela (estilo iOS) ──
@@ -4520,7 +4560,12 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
                 // monitorado e só vira swipe se o dedo realmente se mover
                 // na horizontal (ver isHorizontal abaixo); um tap parado
                 // continua funcionando normalmente como clique.
-                if (target.closest('input, textarea, select, [contenteditable="true"], [data-no-swipe], .bottom-sheet, .modal, .day-detail-card')) {
+                // #tab-settings tem seu PRÓPRIO carrossel de swipe (entre
+                // Ajuste/Histórico/Backup/Conta) com listeners independentes
+                // na mesma área de toque; sem essa exclusão, os dois
+                // handlers disputam o mesmo gesto e o swipe das sub-abas
+                // nunca completa (sempre volta para a seção atual).
+                if (target.closest('input, textarea, select, [contenteditable="true"], [data-no-swipe], .bottom-sheet, .modal, .day-detail-card, #tab-settings')) {
                     return;
                 }
                 const point = e.touches ? e.touches[0] : e;
@@ -4644,7 +4689,15 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
                 decided = false;
             }
 
-            [viewport, nav].forEach(el => {
+            // Os listeners de toque ficam no .container inteiro (não só no
+            // #swipe-viewport) porque o viewport tem sua altura ajustada
+            // dinamicamente para caber exatamente o conteúdo da aba ativa
+            // (ver syncSwipeViewportHeight). Qualquer espaço vazio abaixo
+            // do último card, mas ainda acima da barra inferior, fica fora
+            // do viewport — e precisa continuar respondendo ao deslize.
+            const swipeArea = document.querySelector('.container');
+            [swipeArea, nav].forEach(el => {
+                if (!el) return;
                 el.addEventListener('touchstart', onPointerDown, { passive: true });
                 el.addEventListener('touchmove', onPointerMove, { passive: false });
                 el.addEventListener('touchend', onPointerUp, { passive: true });
@@ -4857,11 +4910,17 @@ window.appData = { books: [], sessions: [], finishedBooks: [] };
                 decided = false;
             }
 
-            viewport.addEventListener('touchstart', onPointerDown, { passive: true });
-            viewport.addEventListener('touchmove', onPointerMove, { passive: false });
-            viewport.addEventListener('touchend', onPointerUp, { passive: true });
-            viewport.addEventListener('touchcancel', onPointerUp, { passive: true });
-            viewport.addEventListener('mousedown', onPointerDown);
+            // Mesmo ajuste do carrossel principal: o #settings-swipe-viewport
+            // tem altura ajustada para caber exatamente o conteúdo da seção
+            // ativa, então qualquer espaço vazio abaixo dela (mas ainda
+            // dentro da aba Configurações) fica fora do viewport. Anexamos
+            // os listeners à aba tab-settings inteira para cobrir essa área.
+            const settingsSwipeArea = document.getElementById('tab-settings') || viewport;
+            settingsSwipeArea.addEventListener('touchstart', onPointerDown, { passive: true });
+            settingsSwipeArea.addEventListener('touchmove', onPointerMove, { passive: false });
+            settingsSwipeArea.addEventListener('touchend', onPointerUp, { passive: true });
+            settingsSwipeArea.addEventListener('touchcancel', onPointerUp, { passive: true });
+            settingsSwipeArea.addEventListener('mousedown', onPointerDown);
             window.addEventListener('mousemove', onPointerMove);
             window.addEventListener('mouseup', onPointerUp);
         })();
@@ -7430,6 +7489,7 @@ function showAuthScreen() {
 }
 function hideAuthScreen() {
     document.getElementById('auth-screen').classList.add('hidden');
+    requestAnimationFrame(syncGearAlignment);
 }
 
 window.toggleAuthMode = function() {
